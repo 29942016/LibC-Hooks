@@ -69,7 +69,7 @@ static int __init entry_point(void)
     make_rw((unsigned long)system_call_table_addr);
 	
     /*Change syscall to our syscall function*/
-    system_call_table_addr[__NR_uname] = override_syscall;
+    system_call_table_addr[__NR_uname] = overide_syscall;
 	
     return 0;
 }
