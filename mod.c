@@ -12,7 +12,11 @@
 #include <linux/unistd.h>
 #include <asm/cacheflush.h>
  
+// Syscall Table Reference
 // /usr/src/kernels/4.8.15-300.fc25.x86_64/arch/x86/entry/syscalls/syscall_32.tbl
+//
+// Syscall Table Address
+// cat /proc/kallsyms | grep sys_call_table
 
 //Required for load_address()
 MODULE_LICENSE("GPL"); 
@@ -24,7 +28,7 @@ void **system_call_table_addr;
 asmlinkage int (*original_syscall) (char* name);
  
 // Our desired functionallity when the hook gets hit.
-asmlinkage int captain_hook(char* play_here) 
+asmlinkage int overide_syscall(char* play_here) 
 {
     printk(KERN_INFO "Hook triggered.\n");
     return original_syscall(play_here);
@@ -65,7 +69,7 @@ static int __init entry_point(void)
     make_rw((unsigned long)system_call_table_addr);
 	
     /*Change syscall to our syscall function*/
-    system_call_table_addr[__NR_uname] = captain_hook;
+    system_call_table_addr[__NR_uname] = override_syscall;
 	
     return 0;
 }
