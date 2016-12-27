@@ -25,13 +25,20 @@ MODULE_LICENSE("GPL");
 void **system_call_table_addr;
  
 /*my custom syscall that takes process name*/
-asmlinkage int (*original_syscall) (char* name);
+asmlinkage int (*original_uname) (char* name);
+asmlinkage int (*original_open) (char* file, int flag, int mode);
  
 // Our desired functionallity when the hook gets hit.
-asmlinkage int overide_syscall(char* play_here) 
+asmlinkage int overide_uname(char* play_here) 
 {
-    printk(KERN_INFO "Hook triggered.\n");
-    return original_syscall(play_here);
+    printk(KERN_INFO "Hook triggered\n");
+    return original_uname(play_here);
+}
+
+asmlinkage int overide_open(char* file, int flags, int mode)
+{
+	printk(KERN_INFO "Open file hook triggered\n");
+	return original_open(file, flags, mode);
 }
  
 /*Make page writeable*/
@@ -59,17 +66,18 @@ int make_ro(unsigned long address)
 static int __init entry_point(void)
 {
     printk(KERN_INFO "Module loaded into kernel space.\n");
-    /*MY sys_call_table address*/
     system_call_table_addr = (void*)0xffffffff83a001c0;
  
     /* Replace custom syscall with the correct system call name (write,open,etc) to hook*/
-    original_syscall = system_call_table_addr[__NR_uname];
+    original_uname = system_call_table_addr[__NR_uname];
+	original_open  = system_call_table_addr[__NR_open];
  
     /*Disable page protection*/
     make_rw((unsigned long)system_call_table_addr);
 	
     /*Change syscall to our syscall function*/
-    system_call_table_addr[__NR_uname] = overide_syscall;
+    system_call_table_addr[__NR_uname] = overide_uname;
+	system_call_table_addr[__NR_open] = overide_open;
 	
     return 0;
 }
@@ -79,7 +87,8 @@ static void __exit exit_point(void)
     printk(KERN_INFO "Module unloaded.\n");
  
     /*Restore original system call */
-    system_call_table_addr[__NR_uname] = original_syscall;
+    system_call_table_addr[__NR_uname] = original_uname;
+    system_call_table_addr[__NR_open] = original_open;
  
     /*Renable page protection*/
     make_ro((unsigned long)system_call_table_addr);
