@@ -11,7 +11,8 @@
 #include <linux/moduleparam.h>
 #include <linux/unistd.h>
 #include <asm/cacheflush.h>
- 
+#include <linux/utsname.h>
+
 // Syscall Table Reference
 // /usr/src/kernels/4.8.15-300.fc25.x86_64/arch/x86/entry/syscalls/syscall_32.tbl
 //
@@ -25,19 +26,27 @@ MODULE_LICENSE("GPL");
 void **system_call_table_addr;
  
 /*my custom syscall that takes process name*/
-asmlinkage int (*original_uname) (char* name);
+asmlinkage int (*original_uname) (struct new_utsname *);
 asmlinkage int (*original_open) (char* file, int flag, int mode);
  
 // Our desired functionallity when the hook gets hit.
-asmlinkage int overide_uname(char* play_here) 
+asmlinkage int overide_uname(struct new_utsname *buf) 
 {
-    printk(KERN_INFO "Hook triggered\n");
-    return original_uname(play_here);
+//	char* sysname = utsname()->version;
+	const char* msg = "Hooked, argh!";
+	int length = strlen(msg);
+
+    printk(KERN_INFO "Hook triggered - %s\n", buf->sysname);
+
+	//original_uname(buf);
+	strncpy(buf->sysname, msg, length);
+
+    return 0;
 }
 
 asmlinkage int overide_open(char* file, int flags, int mode)
 {
-	printk(KERN_INFO "Open file hook triggered\n");
+//	printk(KERN_INFO "Open file hook triggered - %s - %d - %d\n", file, flags, mode);
 	return original_open(file, flags, mode);
 }
  
