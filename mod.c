@@ -29,16 +29,19 @@ void **system_call_table_addr;
 asmlinkage int (*original_uname) (struct new_utsname *);
 asmlinkage int (*original_open) (char* file, int flag, int mode);
  
-// Our desired functionallity when the hook gets hit.
+// Replaces the Uname syscall with `msg`.
 asmlinkage int overide_uname(struct new_utsname *buf) 
 {
-//	char* sysname = utsname()->version;
-	const char* msg = "Hooked, argh!";
+	const char* msg = "Uname hook triggered";
 	int length = strlen(msg);
 
-    printk(KERN_INFO "Hook triggered - %s\n", buf->sysname);
+	// Put the original uname values into our structure.
+	original_uname(buf);
 
-	//original_uname(buf);
+	// Print the true values to the kernel log.
+    printk(KERN_INFO "[Hook] Uname(%s)\n", buf->sysname);
+
+	// Override the output to the user.
 	strncpy(buf->sysname, msg, length);
 
     return 0;
@@ -46,7 +49,7 @@ asmlinkage int overide_uname(struct new_utsname *buf)
 
 asmlinkage int overide_open(char* file, int flags, int mode)
 {
-//	printk(KERN_INFO "Open file hook triggered - %s - %d - %d\n", file, flags, mode);
+	printk(KERN_INFO "[Hook] Open(%s, %d, %d)\n", file, flags, mode);
 	return original_open(file, flags, mode);
 }
  
