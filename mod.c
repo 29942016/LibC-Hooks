@@ -11,7 +11,7 @@
 #include <linux/moduleparam.h>
 #include <linux/unistd.h>
 #include <asm/cacheflush.h>
-#include <linux/utsname.h>
+#include "hooks.h"
 
 // Syscall Table Reference
 // /usr/src/kernels/4.8.15-300.fc25.x86_64/arch/x86/entry/syscalls/syscall_32.tbl
@@ -24,34 +24,6 @@ MODULE_LICENSE("GPL");
 
 // Pointer the Kernels system call table.
 void **system_call_table_addr;
- 
-// Store the address of the original syscall functions so we can restore them later.
-asmlinkage int (*original_uname) (struct new_utsname *);
-asmlinkage int (*original_open) (char* file, int flag, int mode);
- 
-// Replaces the Uname syscall with `msg`.
-asmlinkage int overide_uname(struct new_utsname *buf) 
-{
-	const char* msg = "Uname hook triggered";
-	int length = strlen(msg);
-
-	// Put the original uname values into our structure.
-	original_uname(buf);
-
-	// Print the true values to the kernel log.
-    printk(KERN_INFO "[Hook] Uname(%s)\n", buf->sysname);
-
-	// Override the output to the user.
-	strncpy(buf->sysname, msg, length);
-
-    return 0;
-}
-
-asmlinkage int overide_open(char* file, int flags, int mode)
-{
-	printk(KERN_INFO "[Hook] Open(%s, %d, %d)\n", file, flags, mode);
-	return original_open(file, flags, mode);
-}
  
 // Make page writeable.
 int make_rw(unsigned long address)
@@ -78,7 +50,7 @@ int make_ro(unsigned long address)
  
 static int __init entry_point(void)
 {
-    printk(KERN_INFO "Module loaded into kernel space.\n");
+    printk(KERN_INFO "[STATE]: Loading module into kernel space...\n");
     system_call_table_addr = (void*)0xffffffff83a001c0;
  
     // Replace custom syscall with the correct system call name (write,open,etc) to hook.
@@ -92,19 +64,20 @@ static int __init entry_point(void)
     system_call_table_addr[__NR_uname] = overide_uname;
 	system_call_table_addr[__NR_open] = overide_open;
 	
+    printk(KERN_INFO "[STATE]: Module loaded into kernel space.\n");
     return 0;
 }
  
 static void __exit exit_point(void)
 {
-    printk(KERN_INFO "Module unloaded.\n");
- 
     // Restore original system call.
     system_call_table_addr[__NR_uname] = original_uname;
     system_call_table_addr[__NR_open] = original_open;
  
     // Renable page protection.
     make_ro((unsigned long)system_call_table_addr);
+
+    printk(KERN_INFO "[STATE]: Module unloaded.\n");
 }
  
 module_init(entry_point);
