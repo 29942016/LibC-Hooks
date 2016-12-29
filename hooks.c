@@ -20,7 +20,7 @@ asmlinkage int overide_uname(struct new_utsname *buf)
 asmlinkage int (*original_open) (char* file, int flag, int mode);
 asmlinkage int overide_open(char* file, int flags, int mode)
 {
-			printk(KERN_INFO "[Hook] Open(%s, %d, %d)\n", file, flags, mode);
-				return original_open(file, flags, mode);
+	//printk(KERN_INFO "[Hook] Open(%s, %d, %d)\n", file, flags, mode);
+	return original_open(file, flags, mode);
 }
 

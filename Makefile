@@ -1,5 +1,5 @@
 obj-m += output.o
-output-objs := mod.o hooks.o
+output-objs := mod.o hooks.o io.o
 
 
 all:
