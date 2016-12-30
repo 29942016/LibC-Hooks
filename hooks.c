@@ -6,21 +6,27 @@
 asmlinkage int (*original_uname) (struct new_utsname *);
 asmlinkage int overide_uname(struct new_utsname *buf)
 {
-	const char* msg = "Uname hook triggered";
-	int length = strlen(msg);
+	struct new_utsname our_uts =
+   	{ 
+		.sysname = "Loonix", 
+		.nodename = "Nodename", 
+		.release = "Release", 
+		.version = "Version", 
+		.machine = "Machine",
+	    .domainname = "DomainName",
+	};
 
-	original_uname(buf);
-	printk(KERN_INFO "[Hook] Uname(%s)\n", buf->sysname);
+	struct new_utsname *p_uts = &our_uts;
 
-	strncpy(buf->sysname, msg, length);
+	*buf = *p_uts;
 
-	return 0;
+	return 0; //original_uname(buf);
 }
 
 asmlinkage int (*original_open) (char* file, int flag, int mode);
 asmlinkage int overide_open(char* file, int flags, int mode)
 {
-	//printk(KERN_INFO "[Hook] Open(%s, %d, %d)\n", file, flags, mode);
+	//printk(KERN_INFO "[Hook]:\tOpen(%s, %d, %d)\n", file, flags, mode);
 	return original_open(file, flags, mode);
 }
 

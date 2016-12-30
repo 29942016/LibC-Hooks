@@ -9,7 +9,10 @@ int prsyms_print_symbol(void* data, const char* namebuf,
 	char* table = "sys_call_table";
 
 	if(strcmp(table, namebuf) == 0)
+	{
+		printk(KERN_INFO "[LIBC @]:\t0x%lx\n", address);
 		table_addy = address;
+	}
 
 	return 0;
 }
