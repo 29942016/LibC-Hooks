@@ -2,18 +2,22 @@
 #include <linux/module.h>
 #include <linux/kernel.h>
 #include <linux/utsname.h>
+#include <linux/cred.h>
+
+asmlinkage int (*getuid_call)(void);
+// uid_t uid = getuid_call() -- returns unsigned int of uid
 
 asmlinkage int (*original_uname) (struct new_utsname *);
 asmlinkage int overide_uname(struct new_utsname *buf)
 {
 	struct new_utsname our_uts =
    	{ 
-		.sysname = "Loonix", 
-		.nodename = "Nodename", 
-		.release = "Release", 
-		.version = "Version", 
-		.machine = "Machine",
-	    .domainname = "DomainName",
+		.sysname = "Looonix", 
+		.nodename = "node", 
+		.release = "release", 
+		.version = "0.0.1-Alpha", 
+		.machine = "el1",
+	    .domainname = "dankmemes.net",
 	};
 
 	struct new_utsname *p_uts = &our_uts;
