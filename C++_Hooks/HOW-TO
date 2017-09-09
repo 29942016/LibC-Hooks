@@ -1,0 +1,12 @@
+HOW-TO
+
+Build libhook.cpp with:
+$ gcc -fPIC -shared -ldl ./libhook.cpp -o ./hooks.so
+
+Copy ./hooks.so to where ever.
+$ cp ./hooks.so ./tmp/hooks.so
+
+Set environment var to allow preloading.
+$ export env LD_PRELOAD="/tmp/hooks.so"
+
+Run the helloworld example to see how much shit actually got hooked.

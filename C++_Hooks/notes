@@ -1,2 +1,0 @@
-export env LD_PRELOAD="/tmp/libhook.so"
-gcc -fPIC -shared -o ./libhook.so ./test.cpp -ldl
