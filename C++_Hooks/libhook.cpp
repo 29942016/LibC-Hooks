@@ -6,6 +6,9 @@
 #include <cstring>
 #include <unistd.h>
 
+#include <iostream>
+#include <fstream>
+
 typedef int (*puts_type)(const char*);
 static puts_type real_puts = NULL;
 
@@ -46,6 +49,8 @@ int uname(struct utsname* info)
 
 ssize_t write(int fd, const void *buf, size_t count)
 {	
+	printf("[WRITE HOOK TRIGGERED] %lu\n", count);
+
 	real_write = (write_type)dlsym(RTLD_NEXT, "write");
 	real_write(fd, buf, count);	
 }

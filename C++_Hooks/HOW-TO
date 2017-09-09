@@ -1,7 +1,7 @@
 HOW-TO
 
 Build libhook.cpp with:
-$ gcc -fPIC -shared -ldl ./libhook.cpp -o ./hooks.so
+$ g++ -fPIC -shared -ldl -lstdc++ "$1" -o "$2"
 
 Copy ./hooks.so to where ever.
 $ cp ./hooks.so ./tmp/hooks.so

@@ -20,10 +20,10 @@ void texecve()
 {
 	std::string cd = cwd();
 
-	char *newargv[] = { (char*)"ls", (char*)"-al", &cd[0] };
-	char *newenviron[] = { NULL };
+	char *newargv[] = { (char*)"ls", (char*)"-al", &cd[0] , NULL };
+	char *newenviron[] = { (char*)"PATH=/bin" }; // TODO get actual env var
 
-	printf("\n[TEST] LS \n");
+	printf("\n[TEST] EXECVE \n");
 	execve("/usr/bin/ls", newargv, newenviron);
 }
 
