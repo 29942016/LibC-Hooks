@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <cstring>
+#include <unistd.h>
 
 typedef int (*puts_type)(const char*);
 static puts_type real_puts = NULL;
@@ -13,6 +14,18 @@ static write_type real_write = NULL;
 
 typedef int (*uname_type)(struct utsname*);
 static uname_type real_uname = NULL;
+
+typedef int (*execve_type)(const char*, char *const[], char *const[]);
+static execve_type real_execve = NULL;
+
+int execve(const char* filename, char *const argv[], char *const env[])
+{
+	printf("[EXECVE HOOK TRIGGERED]");
+	printf("\n");
+
+	real_execve = (execve_type)dlsym(RTLD_NEXT, "execve");
+	real_execve(filename, argv, env);
+}
 
 int uname(struct utsname* info)
 {
