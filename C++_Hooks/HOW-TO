@@ -10,3 +10,9 @@ Set environment var to allow preloading.
 $ export env LD_PRELOAD="/tmp/hooks.so"
 
 Run the helloworld example to see how much shit actually got hooked.
+
+
+----- NOTES ------
+some libc calls don't trigger function hooks depending
+on if they go through the PLT:
+https://stackoverflow.com/a/5396207

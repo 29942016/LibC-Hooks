@@ -12,6 +12,7 @@ void tputs();
 void twrite();
 void tuname();
 void texecve();
+void tfputs();
 
 std::string cwd();
 std::string execpath();

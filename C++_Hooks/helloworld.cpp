@@ -2,10 +2,11 @@
 
 int main()
 {
+	tfputs();
 	tputs();
 	twrite();
 	tuname();
-	texecve();
+	//texecve(); 
 
 	printf("\n\n[END OF HOOK TEST]\n");
 
@@ -16,12 +17,20 @@ int main()
 	return 0;
 }
 
+void tfputs()
+{
+	fputs("[TEST] FPUTS\n", stdout);
+}
+
 void texecve()
 {
+	// TODO this test causes early process exiting, dunno why.
+	// use it at as the last test.
+	
 	std::string cd = cwd();
 
 	char *newargv[] = { (char*)"ls", (char*)"-al", &cd[0] , NULL };
-	char *newenviron[] = { (char*)"PATH=/bin" }; // TODO get actual env var
+	char *newenviron[] = { (char*)"PATH=/bin" , NULL };
 
 	printf("\n[TEST] EXECVE \n");
 	execve("/usr/bin/ls", newargv, newenviron);

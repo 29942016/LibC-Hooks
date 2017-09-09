@@ -21,6 +21,19 @@ static uname_type real_uname = NULL;
 typedef int (*execve_type)(const char*, char *const[], char *const[]);
 static execve_type real_execve = NULL;
 
+typedef int (*fputs_type)(const char*, FILE*);
+static fputs_type real_fputs = NULL;
+
+
+int fputs(const char *s, FILE *stream)
+{
+	printf("[FPUTS HOOK TRIGGERED]");
+	printf("\n");
+
+	real_fputs = (fputs_type)dlsym(RTLD_NEXT, "fputs");
+	real_fputs(s, stream);
+}
+
 int execve(const char* filename, char *const argv[], char *const env[])
 {
 	printf("[EXECVE HOOK TRIGGERED]");
@@ -49,7 +62,7 @@ int uname(struct utsname* info)
 
 ssize_t write(int fd, const void *buf, size_t count)
 {	
-	printf("[WRITE HOOK TRIGGERED] %lu\n", count);
+	printf("[WRITE HOOK TRIGGERED]", count);
 
 	real_write = (write_type)dlsym(RTLD_NEXT, "write");
 	real_write(fd, buf, count);	
