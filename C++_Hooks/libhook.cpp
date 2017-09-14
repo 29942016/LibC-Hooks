@@ -3,7 +3,7 @@
 
 int fputs(const char *s, FILE *stream)
 {
-	printf("[FPUTS HOOK TRIGGERED]");
+	//printf("[FPUTS HOOK TRIGGERED]");
 	printf("\n");
 
 	real_fputs = (fputs_type)dlsym(RTLD_NEXT, "fputs");
@@ -12,7 +12,7 @@ int fputs(const char *s, FILE *stream)
 
 int execve(const char* filename, char *const argv[], char *const env[])
 {
-	printf("[EXECVE HOOK TRIGGERED]");
+	//printf("[EXECVE HOOK TRIGGERED]");
 	printf("\n");
 
 	real_execve = (execve_type)dlsym(RTLD_NEXT, "execve");
@@ -23,7 +23,7 @@ int uname(struct utsname* info)
 {
 	real_uname = (uname_type)dlsym(RTLD_NEXT, "uname");
 
-	printf("[UNAME HOOK TRIGGERED]");
+	//printf("[UNAME HOOK TRIGGERED]");
 	printf("\n");
 
 	real_uname(info);
@@ -40,7 +40,7 @@ int uname(struct utsname* info)
 
 ssize_t write(int fd, const void *buf, size_t count)
 {	
-	printf("[WRITE HOOK TRIGGERED]", count);
+	//printf("[WRITE HOOK TRIGGERED]", count);
 
 	real_write = (write_type)dlsym(RTLD_NEXT, "write");
 	real_write(fd, buf, count);	
@@ -48,7 +48,7 @@ ssize_t write(int fd, const void *buf, size_t count)
 
 int puts(const char* str)
 {
-	printf("[PUTS HOOK TRIGGERED]");
+	//printf("[PUTS HOOK TRIGGERED]");
 	printf("\n");
 
     real_puts = (puts_type)dlsym(RTLD_NEXT, "puts");

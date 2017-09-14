@@ -6,12 +6,15 @@ int pull()
 
 	bool payloadExists = fileExists(_PayloadLocal);
 
-	fputs(payloadExists ? "Exists" : "Doesn't Exist", stdout);
+	//fputs(payloadExists ? "Exists" : "Doesn't Exist", stdout);
 
-	if(!payloadExists)
-		download();
-	
-	execute();
+	//if(!payloadExists)
+	//  	download();
+
+	payloadRunning();
+	//fputs(payloadRunning() ? "\nIs running" : "\nIsn't running", stdout);
+
+	//execute();
 
 	return 0;
 }
@@ -21,6 +24,36 @@ bool fileExists(std::string name)
 {
 	struct stat buffer;
 	return (stat (name.c_str(), &buffer) == 0);
+}
+
+bool payloadRunning()
+{
+	char command[32];
+	
+	sprintf(command, "pgrep %s > /dev/null", _ProcName);
+
+	pid_t pid = fork();
+	if(pid == 0)
+	{
+		system(command);
+		exit(1);
+	}
+
+	std::cout << "\nPID: " << command << std::endl;
+
+	//return(0 == system(command));
+
+/*	pid_t pid = fork();
+
+	if(pid == 0)
+	{
+		errno = execl("/usr/bin/killall", "killall", "-0", _ProcName.c_str(), NULL);
+		exit(errno);
+
+	}
+
+	std::cout << "ERRNO: " << errno << std::endl;
+	return(errno == 0);*/
 }
 
 void download()
