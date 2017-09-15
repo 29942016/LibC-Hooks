@@ -1,4 +1,7 @@
 #include "dropper.h"
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 int pull()
 {
@@ -28,24 +31,23 @@ bool fileExists(std::string name)
 
 bool payloadRunning()
 {
-//	char command[64];
-//	snprintf(command, 64, "pgrep %s", _ProcName);
-	const char* command = "pgrep TempProcess";
+	// Save PID to file.
+	if(fork() == 0)
+	{
+		int fd = open("/tmp/text.txt", O_RDWR | O_CREAT, 0666);
 
-	std::array<char, 128> buffer;
-	std::string result;
-	std::shared_ptr<FILE> pipe(popen(command, "r"), pclose);
+		dup2(fd, 1);
+		dup2(fd, 2);
 
-	if(!pipe)
-		throw std::runtime_error("pipe error");
+		close(fd);
 
-//	while(!feof(pipe.get()))
-//	{
-		if(fgets(buffer.data(), 128, pipe.get()) != NULL)
-			result += buffer.data();
-//	}
+		char* argv[] = { (char*)"pgrep", (char*)"TestProcess", (char*)0};
+		execve("/usr/bin/pgrep", argv, NULL);
+	}
 
-	std::cout << "PID: " << result << std::endl;
+
+	std::cout << "\n==========================" << std::endl;
+
 	return false;
 }
 
