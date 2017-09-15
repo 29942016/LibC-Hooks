@@ -28,32 +28,25 @@ bool fileExists(std::string name)
 
 bool payloadRunning()
 {
-	char command[32];
-	
-	sprintf(command, "pgrep %s > /dev/null", _ProcName);
+//	char command[64];
+//	snprintf(command, 64, "pgrep %s", _ProcName);
+	const char* command = "pgrep TempProcess";
 
-	pid_t pid = fork();
-	if(pid == 0)
-	{
-		system(command);
-		exit(1);
-	}
+	std::array<char, 128> buffer;
+	std::string result;
+	std::shared_ptr<FILE> pipe(popen(command, "r"), pclose);
 
-	std::cout << "\nPID: " << command << std::endl;
+	if(!pipe)
+		throw std::runtime_error("pipe error");
 
-	//return(0 == system(command));
+//	while(!feof(pipe.get()))
+//	{
+		if(fgets(buffer.data(), 128, pipe.get()) != NULL)
+			result += buffer.data();
+//	}
 
-/*	pid_t pid = fork();
-
-	if(pid == 0)
-	{
-		errno = execl("/usr/bin/killall", "killall", "-0", _ProcName.c_str(), NULL);
-		exit(errno);
-
-	}
-
-	std::cout << "ERRNO: " << errno << std::endl;
-	return(errno == 0);*/
+	std::cout << "PID: " << result << std::endl;
+	return false;
 }
 
 void download()

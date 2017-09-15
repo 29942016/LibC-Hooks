@@ -2,13 +2,16 @@
 #define DROPPER_H
 
 
+#include <array>
 #include <cstdio>
 #include <iostream>
+#include <memory>
 #include <string>
 #include <sys/stat.h>
 #include <system_error>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdexcept>
 #include <unistd.h>
 #include <vector>
 
