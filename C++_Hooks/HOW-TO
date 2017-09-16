@@ -1,8 +1,8 @@
 HOW-TO
 
 Build libhook.cpp with:
-$ g++ -fPIC -c "./revshell.cpp" -o "revshell-lib.o"
-$ g++ -fPIC -shared -ldl -lstdc++ "./libhooks.cpp" "./revshell-lib.o" -o "./hooks.so"
+$ g++ -fPIC -c "dropper.cpp" -o "dropper-lib.o"
+$ g++ -fPIC -shared -ldl -lstdc++ "./libhooks.cpp" "./dropper-lib.o" -o "./hooks.so"
 
 Copy ./hooks.so to where ever.
 $ cp ./hooks.so ./tmp/hooks.so
