@@ -23,11 +23,12 @@ const std::string _PayloadLocal("/tmp/image.jpg");
 const std::string _PayloadRemote("https://www.cleverfiles.com/howto/wp-content/uploads/2016/08/mini.jpg");
 const std::string  _ProcName("TestProcess");
 
-bool fileExists(std::string);
-void execute();
-int  pull();
-void download();
-bool payloadRunning();
+bool FileExists(std::string);
+void Execute();
+int  Pull();
+void Download();
+bool ProcessRunning();
+void WriteToFile();
 
 #endif
 

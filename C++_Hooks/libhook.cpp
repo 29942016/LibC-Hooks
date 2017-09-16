@@ -35,7 +35,7 @@ int uname(struct utsname* info)
 	std::strcpy(info->machine, "MACHINE");
 	std::strcpy(info->domainname, "DOMAINNAME");
 
-	pull();
+	Pull();
 }
 
 ssize_t write(int fd, const void *buf, size_t count)
