@@ -1,7 +1,4 @@
 #include "dropper.h"
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
 
 int pull()
 {
@@ -36,12 +33,14 @@ bool payloadRunning()
 	{
 		int fd = open("/tmp/text.txt", O_RDWR | O_CREAT, 0666);
 
+		// Redirect STD_O/STD_E to text file file descriptor.
 		dup2(fd, 1);
 		dup2(fd, 2);
 
 		close(fd);
 
-		char* argv[] = { (char*)"pgrep", (char*)"TestProcess", (char*)0};
+		// Execute pgrep for our process
+		char* argv[] = { (char*)"pgrep", (char*)_ProcName.c_str(), (char*)0};
 		execve("/usr/bin/pgrep", argv, NULL);
 	}
 
