@@ -90,6 +90,7 @@ void WriteToFile()
 	}
 }
 
+// TODO Test this works with curl.
 void Download()
 {
 	// Webclients path
